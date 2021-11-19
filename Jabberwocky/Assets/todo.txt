@@ -1,8 +1,0 @@
-
-hedge thing
-
-manager of where and how to place things
-	Place 4 hedges randomly in a quadrant, staying clear of the wall
-	place a tower in one
-
-LETS GO!
