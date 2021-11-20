@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 60;
 
+    public GameObject cameraObject;
+
     void Update()
     {
         if (Input.GetKey(KeyCode.W))
@@ -30,8 +32,11 @@ public class PlayerController : MonoBehaviour
 
         
         float x = Input.GetAxis("Mouse X");
+        float y = Input.GetAxis("Mouse Y");
 
         transform.Rotate(Vector3.up, x);
+
+        cameraObject.transform.Rotate(Vector3.left, y);
     }
 
 }

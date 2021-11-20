@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randValue: 1
-  worldSize: 400
+  worldSize: 256
   treeCount: 8000
   worldPlane: {fileID: 533329560}
   treePrefabs:
@@ -256,6 +256,9 @@ MonoBehaviour:
   - {fileID: 5440609583215552743, guid: fa3763c7e86a20f4a9f00aba506e9a2f, type: 3}
   - {fileID: 1700761997939838556, guid: b8fec2f2c819bd54e97405e587508981, type: 3}
   socketPrefab: {fileID: 4146137473938396420, guid: d854f31bb533cd143baeb54f4719387b, type: 3}
+  POIs:
+  - {fileID: 8623910310891764156, guid: acd2a13c86d5444449b12e8c1c4acb11, type: 3}
+  - {fileID: 1454068533819536893, guid: e83d24cd0fb00a24a885dda3d0bbef01, type: 3}
 --- !u!4 &592958588
 Transform:
   m_ObjectHideFlags: 0
@@ -455,11 +458,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1397754426}
+  - component: {fileID: 1397754421}
   - component: {fileID: 1397754425}
   - component: {fileID: 1397754424}
   - component: {fileID: 1397754423}
   - component: {fileID: 1397754422}
-  - component: {fileID: 1397754421}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -480,6 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 20
+  cameraObject: {fileID: 963194225}
 --- !u!54 &1397754422
 Rigidbody:
   m_ObjectHideFlags: 0
