@@ -19,6 +19,10 @@ public class WorldGenerator : MonoBehaviour
     float socketRadius = 20;
     float POIRadius = 40;
 
+    public GameObject constantPrefab;
+
+    List<GameObject> objectsToBeReset = new List<GameObject>();
+
     bool PlacementIsValid(List<Vector3> placedObjects, Vector3 currentPlacement, float radius1, float radius2)
     {
         foreach (Vector3 vt in placedObjects)
@@ -31,10 +35,31 @@ public class WorldGenerator : MonoBehaviour
         return true;
     }
 
+
     private void Start()
     {
         worldPlane.transform.localScale = new Vector3(worldSize, 1, worldSize);
 
+        //generate constant tiles
+        for (int x = -1; x < 2; ++x)
+        {
+            for (int y = -1; y < 2; ++y)
+            {
+                if(x==0 && y == 0)
+                {
+                    continue;
+                }
+                GameObject obj = Instantiate(constantPrefab);
+                obj.transform.position = new Vector3(x * worldSize, 0, y * worldSize);
+                obj.transform.localScale = new Vector3(worldSize, 1, worldSize);
+            }
+        }
+
+        GenerateWorld();
+    }
+
+    void GenerateWorld()
+    {
         List<Vector3> validTrees = new List<Vector3>();
         List<Vector3> validSockets = new List<Vector3>();
         List<Vector3> validPOI = new List<Vector3>();
@@ -99,8 +124,9 @@ public class WorldGenerator : MonoBehaviour
             int val = Random.Range(0, 3);
             obj = Instantiate(treePrefabs[val]);
             obj.transform.position = validTrees[i];
-            obj.transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0,360), 0));
+            obj.transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0));
             obj.name = i.ToString();
+            objectsToBeReset.Add(obj);
         }
 
         for (int i = 0; i < validSockets.Count; ++i)
@@ -109,6 +135,7 @@ public class WorldGenerator : MonoBehaviour
             obj = Instantiate(socketPrefab);
             obj.transform.position = validSockets[i] + new Vector3(-socketRadius / 2, 10.27f, -socketRadius / 2);
             obj.name = $"socket {i}";
+            objectsToBeReset.Add(obj);
         }
 
         for (int i = 0; i < validPOI.Count; ++i)
@@ -117,6 +144,25 @@ public class WorldGenerator : MonoBehaviour
             obj = Instantiate(POIs[i]);
             obj.transform.position = validPOI[i] + new Vector3(0, 9.35f, 0);
             obj.name = $"poi {i}";
+            objectsToBeReset.Add(obj);
+        }
+    }
+
+    void DestoryWorld()
+    {
+        foreach (GameObject obj in objectsToBeReset)
+        {
+            Destroy(obj);
+        }
+        objectsToBeReset.Clear();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            DestoryWorld();
+            GenerateWorld();
         }
     }
 }

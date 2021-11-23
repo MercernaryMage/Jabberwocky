@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
 
     public GameObject cameraObject;
 
+    public GameObject generationCamera;
+
     void Update()
     {
         if (Input.GetKey(KeyCode.W))
@@ -30,7 +32,15 @@ public class PlayerController : MonoBehaviour
             transform.localPosition += transform.right * speed * Time.deltaTime;
         }
 
-        
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            generationCamera.SetActive(!generationCamera.activeInHierarchy);
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         float x = Input.GetAxis("Mouse X");
         float y = Input.GetAxis("Mouse Y");
 
