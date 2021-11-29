@@ -10,6 +10,11 @@ public class PlayerController : MonoBehaviour
 
     public GameObject generationCamera;
 
+    private void Start()
+    {
+        Cursor.visible = false;
+    }
+
     void Update()
     {
         if (Input.GetKey(KeyCode.W))

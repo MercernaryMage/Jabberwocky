@@ -23,6 +23,9 @@ public class WorldGenerator : MonoBehaviour
 
     List<GameObject> objectsToBeReset = new List<GameObject>();
 
+    int worldFeatureIndex = 0;
+    public List<GameObject> worldFeatures;
+
     bool PlacementIsValid(List<Vector3> placedObjects, Vector3 currentPlacement, float radius1, float radius2)
     {
         foreach (Vector3 vt in placedObjects)
@@ -35,6 +38,23 @@ public class WorldGenerator : MonoBehaviour
         return true;
     }
 
+    bool PlacementIsValidForGeo(Vector3 currentPlacement, float radius)
+    {
+        Collider[] colliders = Physics.OverlapSphere(currentPlacement, radius);
+        for (int j = 0; j < colliders.Length; ++j)
+        {
+            if (colliders[j].tag == "Floor")
+            {
+                continue;
+            }
+            if (colliders[j].tag == "Player")
+            {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
 
     private void Start()
     {
@@ -85,10 +105,17 @@ public class WorldGenerator : MonoBehaviour
 
             Vector3 currentPlacement = new Vector3(Random.Range(placementRangeNegative, placementRangePositive), 0, Random.Range(placementRangeNegative, placementRangePositive));
 
-            if (PlacementIsValid(validSockets, currentPlacement, socketRadius, socketRadius))
+            if (!PlacementIsValid(validSockets, currentPlacement, socketRadius, socketRadius))
             {
-                validSockets.Add(currentPlacement);
+                continue;
+                
             }
+            if (!PlacementIsValidForGeo(currentPlacement, socketRadius))
+            {
+                continue;
+            }
+
+            validSockets.Add(currentPlacement);
         }
 
         for (int i = 0; i < 100 && validPOI.Count < POIs.Count; ++i)
@@ -98,13 +125,21 @@ public class WorldGenerator : MonoBehaviour
 
             Vector3 currentPlacement = new Vector3(Random.Range(placementRangeNegative, placementRangePositive), 0, Random.Range(placementRangeNegative, placementRangePositive));
 
-            if (PlacementIsValid(validPOI, currentPlacement, POIRadius, POIRadius))
+            if (!PlacementIsValid(validPOI, currentPlacement, POIRadius, POIRadius))
             {
-                if (PlacementIsValid(validSockets, currentPlacement, POIRadius, socketRadius))
-                {
-                    validPOI.Add(currentPlacement);
-                }
+                continue;
+                
             }
+            if (!PlacementIsValid(validSockets, currentPlacement, POIRadius, socketRadius))
+            {
+                continue;
+            }
+            if (!PlacementIsValidForGeo(currentPlacement, POIRadius))
+            {
+                continue;
+            }    
+
+            validPOI.Add(currentPlacement);
         }
 
         //DELETE INVALID TREES
@@ -115,6 +150,27 @@ public class WorldGenerator : MonoBehaviour
             {
                 validTrees.RemoveAt(i);
                 --i;
+            }
+        }
+
+        //CHECK FOR GEO
+        for (int i = 0; i < validTrees.Count; ++i)
+        {
+            Collider[] colliders = Physics.OverlapSphere(validTrees[i], treeRadius);
+            for (int j = 0; j < colliders.Length; ++j)
+            {
+                if (colliders[j].tag == "Floor")
+                {
+                    continue;
+                }
+                if (colliders[j].tag == "Player")
+                {
+                    continue;
+                }
+                
+                validTrees.RemoveAt(i);
+                --i;
+                break;
             }
         }
 
@@ -157,10 +213,26 @@ public class WorldGenerator : MonoBehaviour
         objectsToBeReset.Clear();
     }
 
+    void UpdateWorldFeatures()
+    {
+        for (int i = 0; i < worldFeatures.Count; ++i)
+        {
+            worldFeatures[i].SetActive(i == worldFeatureIndex);
+        }
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
+            DestoryWorld();
+            GenerateWorld();
+        }
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            ++worldFeatureIndex;
+            worldFeatureIndex = worldFeatureIndex % worldFeatures.Count;
+            UpdateWorldFeatures();
             DestoryWorld();
             GenerateWorld();
         }

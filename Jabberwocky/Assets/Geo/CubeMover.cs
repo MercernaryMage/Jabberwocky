@@ -13,7 +13,7 @@ public class CubeMover : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
-        float yValue = Mathf.Abs(Mathf.Cos(time));
+        float yValue = Mathf.Cos(time);
         transform.position = new Vector3(transform.position.x, yValue, transform.position.z);
     }
 }
