@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         Cursor.visible = false;
+        generationCamera.SetActive(!generationCamera.activeInHierarchy);
     }
 
     void Update()

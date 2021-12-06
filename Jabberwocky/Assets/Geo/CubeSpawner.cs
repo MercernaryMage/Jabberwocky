@@ -13,10 +13,10 @@ public class CubeSpawner : MonoBehaviour
             GameObject obj = Instantiate(cubePrefab);
             obj.transform.SetParent(transform);
 
-            float x = Random.Range(-.5f, .5f);
-            float z = Random.Range(-.5f, .5f);
+            //float x = Random.Range(-.5f, .5f);
+            //float z = Random.Range(-.5f, .5f);
 
-            obj.transform.localPosition = new Vector3(x, 0, z);
+            //obj.transform.localPosition = new Vector3(x, 0, z);
         }
     }
 }

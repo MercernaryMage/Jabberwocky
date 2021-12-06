@@ -17,7 +17,7 @@ public class WorldGenerator : MonoBehaviour
 
     float treeRadius = 6;
     float socketRadius = 20;
-    float POIRadius = 40;
+    float POIRadius = 30;
 
     public GameObject constantPrefab;
 
@@ -25,6 +25,9 @@ public class WorldGenerator : MonoBehaviour
 
     int worldFeatureIndex = 0;
     public List<GameObject> worldFeatures;
+
+    int screenshotCount = 0;
+    bool doingScreenShots = false;
 
     bool PlacementIsValid(List<Vector3> placedObjects, Vector3 currentPlacement, float radius1, float radius2)
     {
@@ -60,21 +63,6 @@ public class WorldGenerator : MonoBehaviour
     {
         worldPlane.transform.localScale = new Vector3(worldSize, 1, worldSize);
 
-        //generate constant tiles
-        for (int x = -1; x < 2; ++x)
-        {
-            for (int y = -1; y < 2; ++y)
-            {
-                if(x==0 && y == 0)
-                {
-                    continue;
-                }
-                GameObject obj = Instantiate(constantPrefab);
-                obj.transform.position = new Vector3(x * worldSize, 0, y * worldSize);
-                obj.transform.localScale = new Vector3(worldSize, 1, worldSize);
-            }
-        }
-
         GenerateWorld();
     }
 
@@ -108,7 +96,7 @@ public class WorldGenerator : MonoBehaviour
             if (!PlacementIsValid(validSockets, currentPlacement, socketRadius, socketRadius))
             {
                 continue;
-                
+
             }
             if (!PlacementIsValidForGeo(currentPlacement, socketRadius))
             {
@@ -128,7 +116,7 @@ public class WorldGenerator : MonoBehaviour
             if (!PlacementIsValid(validPOI, currentPlacement, POIRadius, POIRadius))
             {
                 continue;
-                
+
             }
             if (!PlacementIsValid(validSockets, currentPlacement, POIRadius, socketRadius))
             {
@@ -137,7 +125,7 @@ public class WorldGenerator : MonoBehaviour
             if (!PlacementIsValidForGeo(currentPlacement, POIRadius))
             {
                 continue;
-            }    
+            }
 
             validPOI.Add(currentPlacement);
         }
@@ -167,7 +155,7 @@ public class WorldGenerator : MonoBehaviour
                 {
                     continue;
                 }
-                
+
                 validTrees.RemoveAt(i);
                 --i;
                 break;
@@ -179,7 +167,7 @@ public class WorldGenerator : MonoBehaviour
             GameObject obj;
             int val = Random.Range(0, 3);
             obj = Instantiate(treePrefabs[val]);
-            obj.transform.position = validTrees[i];
+            obj.transform.position = validTrees[i] + worldPlane.transform.position;
             obj.transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0));
             obj.name = i.ToString();
             objectsToBeReset.Add(obj);
@@ -189,7 +177,7 @@ public class WorldGenerator : MonoBehaviour
         {
             GameObject obj;
             obj = Instantiate(socketPrefab);
-            obj.transform.position = validSockets[i] + new Vector3(-socketRadius / 2, 10.27f, -socketRadius / 2);
+            obj.transform.position = validSockets[i] + new Vector3(-socketRadius / 2, 10.27f, -socketRadius / 2) + worldPlane.transform.position;
             obj.name = $"socket {i}";
             objectsToBeReset.Add(obj);
         }
@@ -198,7 +186,7 @@ public class WorldGenerator : MonoBehaviour
         {
             GameObject obj;
             obj = Instantiate(POIs[i]);
-            obj.transform.position = validPOI[i] + new Vector3(0, 9.35f, 0);
+            obj.transform.position = validPOI[i] + new Vector3(0, 9.35f, 0) + worldPlane.transform.position;
             obj.name = $"poi {i}";
             objectsToBeReset.Add(obj);
         }
@@ -208,7 +196,7 @@ public class WorldGenerator : MonoBehaviour
     {
         foreach (GameObject obj in objectsToBeReset)
         {
-            Destroy(obj);
+            DestroyImmediate(obj);
         }
         objectsToBeReset.Clear();
     }
@@ -221,8 +209,38 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
+    void AdvanceGeneration()
+    {
+        ++worldFeatureIndex;
+        worldFeatureIndex = worldFeatureIndex % worldFeatures.Count;
+        UpdateWorldFeatures();
+        DestoryWorld();
+        GenerateWorld();
+    }
+
+    public void SetWorld(int i)
+    {
+        worldFeatureIndex = i % worldFeatures.Count;
+        Random.InitState(i);
+        UpdateWorldFeatures();
+        DestoryWorld();
+        GenerateWorld();
+    }
+
     private void Update()
     {
+        if (doingScreenShots)
+        {
+            Random.InitState(screenshotCount + 1);
+            AdvanceGeneration();
+            ScreenCapture.CaptureScreenshot($"Screenshots/test{screenshotCount + 1}.png");
+            ++screenshotCount;
+            if (screenshotCount == 100)
+            {
+                doingScreenShots = false;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             DestoryWorld();
@@ -230,11 +248,13 @@ public class WorldGenerator : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.N))
         {
-            ++worldFeatureIndex;
-            worldFeatureIndex = worldFeatureIndex % worldFeatures.Count;
-            UpdateWorldFeatures();
-            DestoryWorld();
-            GenerateWorld();
+            AdvanceGeneration();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            worldFeatureIndex = 0;
+            screenshotCount = 0;
+            doingScreenShots = true;
         }
     }
 }
